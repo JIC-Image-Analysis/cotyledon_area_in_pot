@@ -42,5 +42,5 @@ $ bash run_docker_container.sh
 Now you can run the image analysis.
 
 ```
-[root@048bd4bd961c /]# python scripts/analysis.py --debug data/ output/
+[root@048bd4bd961c /]# python scripts/analysis.py --debug data/dataset_dir output/
 ```
