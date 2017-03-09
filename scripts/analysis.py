@@ -44,12 +44,11 @@ def find_leafs(image):
     return leafs
 
 
-def annotate(image, leafs, output_path):
+def annotate(image, leafs, area, output_path):
     grayscale = np.mean(image, axis=2)
     ann = AnnotatedImage.from_grayscale(grayscale)
     ann[leafs] = image[leafs]
 
-    area = np.sum(leafs)
     ann.text_at(
         "Area (pixels): {}".format(area),
         position=(10, 10),
@@ -73,16 +72,31 @@ def analyse_file(fpath, output_dir):
     output_fname = os.path.basename(fpath).split(".")[0] + "_annotated.png"
     output_path = os.path.join(output_dir, output_fname)
 
-    annotate(image, leafs, output_path)
+    area = int(np.sum(leafs))
+    annotate(image, leafs, area, output_path)
+    return area
 
 
 def analyse_dataset(dataset_dir, output_dir):
     """Analyse all the files in the dataset."""
     dataset = dtool.DataSet.from_path(dataset_dir)
     logging.info("Analysing files in dataset: {}".format(dataset.name))
-    for i in dataset.identifiers:
-        fpath = dataset.item_path_from_hash(i)
-        analyse_file(fpath, output_dir)
+
+    csv_fpath = os.path.join(output_dir, "summary.csv")
+    with open(csv_fpath, "w") as csv_fh:
+
+        csv_fh.write("identifier,image,tray,area\n")
+
+        for i in dataset.identifiers:
+            fpath = dataset.item_path_from_hash(i)
+            area = analyse_file(fpath, output_dir)
+
+            rel_path = dataset.item_from_hash(i)["path"]
+            csv_row = [i, rel_path, "tray1", str(area)]
+            csv_line = ",".join(csv_row)
+            csv_fh.write(csv_line + "\n")
+
+
 
 
 def main():
