@@ -88,15 +88,19 @@ def analyse_dataset(dataset_dir, output_dir):
         csv_fh.write("identifier,image,tray,area\n")
 
         for i in dataset.identifiers:
-            fpath = dataset.item_path_from_hash(i)
-            area = analyse_file(fpath, output_dir)
 
             rel_path = dataset.item_from_hash(i)["path"]
-            csv_row = [i, rel_path, "tray1", str(area)]
+            tray = os.path.dirname(rel_path)
+            image_out_dir = os.path.join(output_dir, tray)
+            if not os.path.isdir(image_out_dir):
+                os.mkdir(image_out_dir)
+
+            fpath = dataset.item_path_from_hash(i)
+            area = analyse_file(fpath, image_out_dir)
+
+            csv_row = [i, rel_path, tray, str(area)]
             csv_line = ",".join(csv_row)
             csv_fh.write(csv_line + "\n")
-
-
 
 
 def main():
