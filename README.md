@@ -29,7 +29,7 @@ $ bash build_docker_image.sh
 $ cd ..
 ```
 
-## Run the image analysis in a Docker container
+## Start a Docker container to run the image analysis in
 
 The image analysis will be run in a Docker container.  The script
 ``run_docker_container.sh`` will drop you into an interactive Docker session.
@@ -39,8 +39,21 @@ $ bash run_docker_container.sh
 [root@048bd4bd961c /]#
 ```
 
+
+## Whole image analysis
+
 Now you can run the image analysis.
 
 ```
-[root@048bd4bd961c /]# python scripts/analysis.py --debug data/dataset_dir output/
+[root@048bd4bd961c /]# python scripts/whole_image_analysis.py --debug data/dataset_dir output/
+```
+
+## Analyse area within a quadrilateral
+
+Alternatively you can run the analysis on a dataset that has been marked up with
+quadrilateral points using
+[quadrilateral_point_clicker](https://github.com/JIC-Image-Analysis/quadrilateral_point_clicker).
+
+```
+[root@048bd4bd961c /]# python scripts/quadrilateral_analysis.py --debug data/dataset_dir output/
 ```
