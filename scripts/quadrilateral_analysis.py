@@ -52,22 +52,18 @@ def analyse_dataset(dataset_dir, output_dir):
     csv_fpath = os.path.join(output_dir, "summary.csv")
     with open(csv_fpath, "w") as csv_fh:
 
-        csv_fh.write("identifier,image,tray,area\n")
+        csv_fh.write("identifier,image,area\n")
 
         for i in dataset.identifiers:
 
             quadrilateral = quadrilateral_points[i]
 
             rel_path = dataset.item_from_hash(i)["path"]
-            tray = os.path.dirname(rel_path)
-            image_out_dir = os.path.join(output_dir, tray)
-            if not os.path.isdir(image_out_dir):
-                os.mkdir(image_out_dir)
 
             fpath = dataset.item_path_from_hash(i)
-            area = analyse_file(fpath, quadrilateral, image_out_dir)
+            area = analyse_file(fpath, quadrilateral, output_dir)
 
-            csv_row = [i, rel_path, tray, str(area)]
+            csv_row = [i, rel_path, str(area)]
             csv_line = ",".join(csv_row)
             csv_fh.write(csv_line + "\n")
 
