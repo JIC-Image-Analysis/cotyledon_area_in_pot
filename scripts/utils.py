@@ -1,5 +1,7 @@
 """penfiels_cotyledon_tray_area analysis."""
 
+import PIL
+import PIL.ImageDraw
 import numpy as np
 
 from jicbioimage.core.transform import transformation
@@ -30,10 +32,35 @@ def abs_threshold(image, cutoff):
     return image > cutoff
 
 
+
 def find_leafs(image):
     leafs = green_minus_red(image)
     leafs = abs_threshold(leafs, 40)  # 30, 50
     return leafs
+
+
+def scale(relative, dimension):
+    return int(round(relative * dimension))
+
+
+@transformation
+def quadrilateral_mask_from_corners(image, corners):
+    ydim, xdim = image.shape[:2]
+    polygon = [
+        (scale(corners["topLeft"]["x"], xdim), scale(corners["topLeft"]["y"], ydim)),
+        (scale(corners["topRight"]["x"], xdim), scale(corners["topRight"]["y"], ydim)),
+        (scale(corners["bottomRight"]["x"], xdim), scale(corners["bottomRight"]["y"], ydim)),
+        (scale(corners["bottomLeft"]["x"], xdim), scale(corners["bottomLeft"]["y"], ydim))
+    ]
+    print polygon
+    img = PIL.Image.new("L", (xdim, ydim), 0)
+    PIL.ImageDraw.Draw(img).polygon(polygon, outline=255, fill=255)
+    return np.array(img, dtype=bool)
+
+
+@transformation
+def apply_mask(image, mask):
+    return image * mask
 
 
 def annotate(image, leafs, area, output_path):
