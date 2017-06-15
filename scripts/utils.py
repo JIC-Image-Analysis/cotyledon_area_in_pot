@@ -1,5 +1,7 @@
 """penfiels_cotyledon_tray_area analysis."""
 
+import math
+
 import PIL
 import PIL.ImageDraw
 import numpy as np
@@ -52,10 +54,22 @@ def quadrilateral_mask_from_corners(image, corners):
         (scale(corners["bottomRight"]["x"], xdim), scale(corners["bottomRight"]["y"], ydim)),
         (scale(corners["bottomLeft"]["x"], xdim), scale(corners["bottomLeft"]["y"], ydim))
     ]
-    print polygon
     img = PIL.Image.new("L", (xdim, ydim), 0)
     PIL.ImageDraw.Draw(img).polygon(polygon, outline=255, fill=255)
     return np.array(img, dtype=bool)
+
+
+def ruler_length_in_pixels(image, points):
+    ydim, xdim = image.shape[:2]
+    x1 = points[0]["x"] * xdim
+    y1 = points[0]["y"] * ydim
+    x2 = points[1]["x"] * xdim
+    y2 = points[1]["y"] * ydim
+    xdiff = x1 - x2
+    ydiff = y1 - y2
+    dist2 = xdiff**2 + ydiff**2
+    dist = math.sqrt(dist2)
+    return int(round(dist))
 
 
 @transformation

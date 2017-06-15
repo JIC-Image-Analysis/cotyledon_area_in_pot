@@ -17,19 +17,21 @@ from utils import (
     find_leafs,
     annotate,
     apply_mask,
+    ruler_length_in_pixels,
 )
 
 
 __version__ = "0.1.0"
 
 
-def analyse_file(fpath, quadrilateral, output_dir):
+def analyse_file(fpath, quadrilateral, ruler, output_dir):
     """Analyse a single file."""
     logging.info("Analysing file: {}".format(fpath))
     image = Image.from_file(fpath)
 
     image = identity(image)
     mask = quadrilateral_mask_from_corners(image, quadrilateral)
+    ruler_length = ruler_length_in_pixels(image, ruler)
 
     leafs = find_leafs(image)
     leafs = apply_mask(leafs, mask)
@@ -39,8 +41,9 @@ def analyse_file(fpath, quadrilateral, output_dir):
 
     area = int(np.sum(leafs))
     mask_area = int(np.sum(mask.view(np.uint8)))
+
     annotate(image, leafs, area, output_path)
-    return area, mask_area
+    return area, mask_area, ruler_length
 
 
 def analyse_dataset(dataset_dir, output_dir):
@@ -49,22 +52,24 @@ def analyse_dataset(dataset_dir, output_dir):
     logging.info("Analysing files in dataset: {}".format(dataset.name))
 
     quadrilateral_points = dataset.overlays["quadrilateral_points"]
+    ruler_points = dataset.overlays["line_points"]
 
     csv_fpath = os.path.join(output_dir, "summary.csv")
     with open(csv_fpath, "w") as csv_fh:
 
-        csv_fh.write("identifier,image,leaf_area,quadrilateral_area\n")
+        csv_fh.write("identifier,image,leaf_area,quadrilateral_area,ruler_length\n")
 
         for i in dataset.identifiers:
 
             quadrilateral = quadrilateral_points[i]
+            ruler = ruler_points[i]
 
             rel_path = dataset.item_from_hash(i)["path"]
 
             fpath = dataset.item_path_from_hash(i)
-            area, mask_area = analyse_file(fpath, quadrilateral, output_dir)
+            area, mask_area, ruler_length = analyse_file(fpath, quadrilateral, ruler, output_dir)
 
-            csv_row = [i, rel_path, str(area), str(mask_area)]
+            csv_row = [i, rel_path, str(area), str(mask_area), str(ruler_length)]
             csv_line = ",".join(csv_row)
             csv_fh.write(csv_line + "\n")
 
