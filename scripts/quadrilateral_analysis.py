@@ -38,8 +38,9 @@ def analyse_file(fpath, quadrilateral, output_dir):
     output_path = os.path.join(output_dir, output_fname)
 
     area = int(np.sum(leafs))
+    mask_area = int(np.sum(mask.view(np.uint8)))
     annotate(image, leafs, area, output_path)
-    return area
+    return area, mask_area
 
 
 def analyse_dataset(dataset_dir, output_dir):
@@ -52,7 +53,7 @@ def analyse_dataset(dataset_dir, output_dir):
     csv_fpath = os.path.join(output_dir, "summary.csv")
     with open(csv_fpath, "w") as csv_fh:
 
-        csv_fh.write("identifier,image,area\n")
+        csv_fh.write("identifier,image,leaf_area,quadrilateral_area\n")
 
         for i in dataset.identifiers:
 
@@ -61,9 +62,9 @@ def analyse_dataset(dataset_dir, output_dir):
             rel_path = dataset.item_from_hash(i)["path"]
 
             fpath = dataset.item_path_from_hash(i)
-            area = analyse_file(fpath, quadrilateral, output_dir)
+            area, mask_area = analyse_file(fpath, quadrilateral, output_dir)
 
-            csv_row = [i, rel_path, str(area)]
+            csv_row = [i, rel_path, str(area), str(mask_area)]
             csv_line = ",".join(csv_row)
             csv_fh.write(csv_line + "\n")
 
