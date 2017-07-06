@@ -49,10 +49,10 @@ def scale(relative, dimension):
 def quadrilateral_mask_from_corners(image, corners):
     ydim, xdim = image.shape[:2]
     polygon = [
-        (scale(corners["topLeft"]["x"], xdim), scale(corners["topLeft"]["y"], ydim)),
-        (scale(corners["topRight"]["x"], xdim), scale(corners["topRight"]["y"], ydim)),
-        (scale(corners["bottomRight"]["x"], xdim), scale(corners["bottomRight"]["y"], ydim)),
-        (scale(corners["bottomLeft"]["x"], xdim), scale(corners["bottomLeft"]["y"], ydim))
+        (scale(corners[0]["x"], xdim), scale(corners[0]["y"], ydim)),
+        (scale(corners[1]["x"], xdim), scale(corners[1]["y"], ydim)),
+        (scale(corners[3]["x"], xdim), scale(corners[3]["y"], ydim)),
+        (scale(corners[2]["x"], xdim), scale(corners[2]["y"], ydim)),
     ]
     img = PIL.Image.new("L", (xdim, ydim), 0)
     PIL.ImageDraw.Draw(img).polygon(polygon, outline=255, fill=255)
